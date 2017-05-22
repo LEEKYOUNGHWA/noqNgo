@@ -1,0 +1,274 @@
+package com.example.lee.noqngo;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import org.json.JSONObject;
+
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.Iterator;
+
+public class MainActivity extends AppCompatActivity
+        implements NavigationView.OnNavigationItemSelectedListener {
+
+    private static final String FCM_MESSAGE_URL = "https://fcm.googleapis.com/fcm/send";
+    private static final String SERVER_KEY = "AAAA3P78EyQ:APA91bEr9D1AiXux8IrJyqFDiMCNJA0RPdLorOJF880mF661OebBFuY0gfXaCyMRwMZdqld93Nz7s9nhxwl90lSpwf6grNVFPiuNVfPP_iGilssNIfbEZ9fYkPWeqwFc-DYST-lzWXgS";
+    public FirebaseAuth.AuthStateListener authListener;
+    private FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+    private DatabaseReference databaseReference = firebaseDatabase.getReference();
+    private FirebaseAuth auth;
+    private DatabaseReference mDatabase;
+    private ArrayAdapter<String> adapter;
+    private ListView listView1;
+    private TextView textView1;
+    private int keyval;
+    private String name;
+    private String email,uid;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        ListView listView1 = (ListView) findViewById(R.id.listview1);
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+         final ArrayAdapter<String> adapter;
+        //  FirebaseMessaging.getInstance().subscribeToTopic("notice");
+        //  FirebaseInstanceIDService A ;
+
+        Intent intent = getIntent();
+        final String name = intent.getStringExtra("name");
+        final int keyval = intent.getIntExtra("keyval",0);
+        auth = FirebaseAuth.getInstance(); //get firebase auth instance
+        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser(); //get current user
+        email =  user.getEmail();
+        String uid = user.getUid();
+        TextView textView1 = (TextView)findViewById(R.id.key) ;
+        textView1.setText(email+uid+name+keyval);
+
+        authListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+
+                if (user == null) {
+                    // user auth state is changed - user is null
+                    // launch login activity
+                    startActivity(new Intent(MainActivity.this, LoginActivity.class));
+                    finish();
+                }
+            }
+        };
+
+        //고객호출
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Snackbar.make(view, "고객호출", Snackbar.LENGTH_LONG).setAction("Action", null).show();
+            }
+        });
+
+        //드로어
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
+        //고객리스트
+
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, android.R.id.text1);
+        listView1.setAdapter(adapter);
+
+        listView1.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                String a = adapter.getItem(i);
+                Log.d("itemSelected", a);
+                Toast.makeText(getApplicationContext(), a, Toast.LENGTH_LONG).show();
+                final String Data = (String)adapterView.getAdapter().getItem(i);  //리스트뷰의 포지션 내용을 가져옴.
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            // FMC 메시지 생성 start
+                            JSONObject root = new JSONObject();
+                            JSONObject notification = new JSONObject();
+                            notification.put("body", keyval); //여기 가게 번호 넣자
+                            notification.put("title",name);//여기 가게이름 넣고
+                            root.put("data", notification);
+                            // 여기 수정
+                            root.put("to", Data);
+                            // FMC 메시지 생성 end
+
+                            URL Url = new URL(FCM_MESSAGE_URL);
+                            HttpURLConnection conn = (HttpURLConnection) Url.openConnection();
+                            conn.setRequestMethod("POST");
+                            conn.setDoOutput(true);
+                            conn.setDoInput(true);
+                            conn.addRequestProperty("Authorization", "key=" + SERVER_KEY);
+                            conn.setRequestProperty("Accept", "application/json");
+                            conn.setRequestProperty("Content-type", "application/json");
+                            conn.addRequestProperty("url",FCM_MESSAGE_URL);
+                            OutputStream os = conn.getOutputStream();
+                            os.write(root.toString().getBytes("utf-8"));
+                            os.flush();
+                            conn.getResponseCode();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }).start();
+            }
+        });
+
+        listView1.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener(){
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                final String Data = (String)adapterView.getAdapter().getItem(i);  //리스트뷰의 포지션 내용을 가져옴.
+                databaseReference.child("cnt").child(Integer.toString(keyval)).child("inqueue").child(Data).removeValue();
+                Toast.makeText(getApplicationContext(), "삭제", Toast.LENGTH_LONG).show();
+                return true;
+            }
+
+        });
+
+
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
+            // 새로운 구조에 대한 이벤트 리스너 틀
+            databaseReference.child("cnt").child(Integer.toString(keyval)).addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    final QCnt userData = dataSnapshot.getValue(QCnt.class);  // chatData를 가져오고
+                    Iterator iterator = userData.inqueue.keySet().iterator();
+                    adapter.clear();
+                    while (iterator.hasNext()) {
+                        String temp = (String) iterator.next();
+                        adapter.add(temp);  // adapter에 추가합니다.
+                    }
+                    adapter.notifyDataSetChanged();
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+
+    }
+
+
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @SuppressWarnings("StatementWithEmptyBody")
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
+
+        if (id == R.id.nav_camera) {
+            // Handle the camera action
+        } else if (id == R.id.nav_gallery) {
+            Intent intent = new Intent(MainActivity.this, QRcodeActivity.class);
+            startActivity(intent);
+
+        } else if (id == R.id.nav_slideshow) {
+            //nfc sender
+            Intent intent2 = new Intent(MainActivity.this, nfcActivity.class);
+            startActivity(intent2);
+
+        } else if (id == R.id.nav_manage) {
+            //로그아웃
+            signOut();
+        } else if (id == R.id.nav_share) {
+
+        } else if (id == R.id.nav_send) {
+
+        }
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
+    }
+
+    public void signOut() {
+        auth.signOut();
+    }
+    @Override
+    public void onStart() {
+        super.onStart();
+        auth.addAuthStateListener(authListener);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (authListener != null) {
+            auth.removeAuthStateListener(authListener);
+        }
+    }
+}
+
