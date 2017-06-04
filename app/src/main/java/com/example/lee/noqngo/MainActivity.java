@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity
         auth = FirebaseAuth.getInstance(); //get firebase auth instance
         final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser(); //get current user
         email =  user.getEmail();
-        String uid = user.getUid();
+        final String uid = user.getUid();
         TextView textView1 = (TextView)findViewById(R.id.key) ;
         textView1.setText(email+uid+name+keyval);
 
@@ -127,6 +127,7 @@ public class MainActivity extends AppCompatActivity
                             // FMC 메시지 생성 start
                             JSONObject root = new JSONObject();
                             JSONObject notification = new JSONObject();
+                            notification.put("sid",uid);
                             notification.put("body", keyval); //여기 가게 번호 넣자
                             notification.put("title",name);//여기 가게이름 넣고
                             root.put("data", notification);
