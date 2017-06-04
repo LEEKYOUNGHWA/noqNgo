@@ -20,10 +20,11 @@
         android:layout_marginBottom="10dp"
         android:text="key" />
 
-    <ListView
-        android:id="@+id/listview1"
-        android:layout_width="wrap_content"
-        android:layout_height="447dp"
-        android:layout_gravity="center_horizontal" />
+    <GridView
+        android:id="@+id/gridview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:numColumns="3"
+        ></GridView>
 
 </LinearLayout>
