@@ -17,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -34,7 +35,9 @@ import org.json.JSONObject;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -47,11 +50,15 @@ public class MainActivity extends AppCompatActivity
     private FirebaseAuth auth;
     private DatabaseReference mDatabase;
     private ArrayAdapter<String> adapter;
-    private ListView listView1;
+    //private ListView listView1;
     private TextView textView1;
     private int keyval;
     private String name;
     private String email,uid;
+
+    // 추가 0604
+    private List<Griditem> Griditem_;
+    private GridAdapter GridAdapter_;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,7 +66,13 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        ListView listView1 = (ListView) findViewById(R.id.listview1);
+
+        //추가 0604
+        final GridView gridview = (GridView)findViewById(R.id.gridview);
+        Griditem_ = new ArrayList<Griditem>();
+        GridAdapter_ = new GridAdapter(this, R.layout.list_item, Griditem_);
+        gridview.setAdapter(GridAdapter_);
+
         mDatabase = FirebaseDatabase.getInstance().getReference();
          final ArrayAdapter<String> adapter;
         //  FirebaseMessaging.getInstance().subscribeToTopic("notice");
@@ -110,16 +123,15 @@ public class MainActivity extends AppCompatActivity
 
         //고객리스트
 
-        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, android.R.id.text1);
-        listView1.setAdapter(adapter);
 
-        listView1.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+        gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                String a = adapter.getItem(i);
-                Log.d("itemSelected", a);
-                Toast.makeText(getApplicationContext(), a, Toast.LENGTH_LONG).show();
-                final String Data = (String)adapterView.getAdapter().getItem(i);  //리스트뷰의 포지션 내용을 가져옴.
+                Griditem data = (Griditem)adapterView.getAdapter().getItem(i);
+                final String Data_ = data.getToken();
+                Toast.makeText(getApplicationContext(), Data_, Toast.LENGTH_LONG).show();
+           //     final String Data = (String)adapterView.getAdapter().getItem(i);  //리스트뷰의 포지션 내용을 가져옴.
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
@@ -131,7 +143,7 @@ public class MainActivity extends AppCompatActivity
                             notification.put("title",name);//여기 가게이름 넣고
                             root.put("data", notification);
                             // 여기 수정
-                            root.put("to", Data);
+                            root.put("to", Data_);
                             // FMC 메시지 생성 end
 
                             URL Url = new URL(FCM_MESSAGE_URL);
@@ -155,7 +167,7 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        listView1.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener(){
+        gridview.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener(){
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
                 final String Data = (String)adapterView.getAdapter().getItem(i);  //리스트뷰의 포지션 내용을 가져옴.
@@ -174,12 +186,18 @@ public class MainActivity extends AppCompatActivity
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     final QCnt userData = dataSnapshot.getValue(QCnt.class);  // chatData를 가져오고
                     Iterator iterator = userData.inqueue.keySet().iterator();
-                    adapter.clear();
+                    GridAdapter_.clear();
+                    int i = 1;
                     while (iterator.hasNext()) {
                         String temp = (String) iterator.next();
-                        adapter.add(temp);  // adapter에 추가합니다.
+                        String num = Integer.toString(i);
+                        i++;
+                        Griditem plate= new Griditem(num,temp);
+                        GridAdapter_.add(plate);  // adapter에 추가합니다.
+                        plate = null;
+                        System.gc();
                     }
-                    adapter.notifyDataSetChanged();
+                    GridAdapter_.notifyDataSetChanged();
                 }
 
                 @Override
@@ -244,7 +262,8 @@ public class MainActivity extends AppCompatActivity
             //로그아웃
             signOut();
         } else if (id == R.id.nav_share) {
-
+            Intent intent3 = new Intent(MainActivity.this, NFCtagActivity.class);
+            startActivity(intent3);
         } else if (id == R.id.nav_send) {
 
         }
