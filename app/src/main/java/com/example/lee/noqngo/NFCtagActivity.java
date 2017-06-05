@@ -21,6 +21,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.lee.noqngo.R;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -132,8 +134,14 @@ public class NFCtagActivity extends Activity {
      ******************************************************************************/
     private void write(String text, Tag tag) throws IOException, FormatException {
         Uri uri = Uri.parse(text);
-        NdefRecord recordNFC = NdefRecord.createUri("http://"+uri);
-        NdefMessage message2 = new NdefMessage(recordNFC );
+
+        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser(); //get current user
+        String uid = user.getUid();
+
+        String strBarcode = "fir-82b14.firebaseapp.com/customer.html?sid="+uid;
+
+        NdefRecord recordNFC = NdefRecord.createUri("http://"+strBarcode);
+        NdefMessage message2 = new NdefMessage(recordNFC);
         // Get an instance of Ndef for the tag.
         Ndef ndef = Ndef.get(tag);
         // Enable I/O

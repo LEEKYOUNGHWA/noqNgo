@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity
         gridview.setAdapter(GridAdapter_);
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
-         final ArrayAdapter<String> adapter;
+        final ArrayAdapter<String> adapter;
         //  FirebaseMessaging.getInstance().subscribeToTopic("notice");
         //  FirebaseInstanceIDService A ;
 
@@ -131,7 +131,7 @@ public class MainActivity extends AppCompatActivity
                 Griditem data = (Griditem)adapterView.getAdapter().getItem(i);
                 final String Data_ = data.getToken();
                 Toast.makeText(getApplicationContext(), Data_, Toast.LENGTH_LONG).show();
-           //     final String Data = (String)adapterView.getAdapter().getItem(i);  //리스트뷰의 포지션 내용을 가져옴.
+                //     final String Data = (String)adapterView.getAdapter().getItem(i);  //리스트뷰의 포지션 내용을 가져옴.
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
@@ -171,8 +171,10 @@ public class MainActivity extends AppCompatActivity
         gridview.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener(){
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
-                final String Data = (String)adapterView.getAdapter().getItem(i);  //리스트뷰의 포지션 내용을 가져옴.
-                databaseReference.child("cnt").child(Integer.toString(keyval)).child("inqueue").child(Data).removeValue();
+                Griditem data = (Griditem)adapterView.getAdapter().getItem(i);
+                final String Data_ = data.getToken();
+
+                databaseReference.child("cnt").child(Integer.toString(keyval)).child("inqueue").child(Data_).removeValue();
                 Toast.makeText(getApplicationContext(), "삭제", Toast.LENGTH_LONG).show();
                 return true;
             }
@@ -181,31 +183,31 @@ public class MainActivity extends AppCompatActivity
 
 
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
-            // 새로운 구조에 대한 이벤트 리스너 틀
-            databaseReference.child("cnt").child(Integer.toString(keyval)).addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    final QCnt userData = dataSnapshot.getValue(QCnt.class);  // chatData를 가져오고
-                    Iterator iterator = userData.inqueue.keySet().iterator();
-                    GridAdapter_.clear();
-                    int i = 1;
-                    while (iterator.hasNext()) {
-                        String temp = (String) iterator.next();
-                        String num = Integer.toString(i);
-                        i++;
-                        Griditem plate= new Griditem(num,temp);
-                        GridAdapter_.add(plate);  // adapter에 추가합니다.
-                        plate = null;
-                        System.gc();
-                    }
-                    GridAdapter_.notifyDataSetChanged();
+        // 새로운 구조에 대한 이벤트 리스너 틀
+        databaseReference.child("cnt").child(Integer.toString(keyval)).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                final QCnt userData = dataSnapshot.getValue(QCnt.class);  // chatData를 가져오고
+                Iterator iterator = userData.inqueue.keySet().iterator();
+                GridAdapter_.clear();
+                int i = 1;
+                while (iterator.hasNext()) {
+                    String temp = (String) iterator.next();
+                    String num = Integer.toString(i);
+                    i++;
+                    Griditem plate= new Griditem(num,temp);
+                    GridAdapter_.add(plate);  // adapter에 추가합니다.
+                    plate = null;
+                    System.gc();
                 }
+                GridAdapter_.notifyDataSetChanged();
+            }
 
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
 
-                }
-            });
+            }
+        });
 
     }
 
