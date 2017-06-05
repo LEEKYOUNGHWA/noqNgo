@@ -38,6 +38,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Vector;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -191,15 +192,24 @@ public class MainActivity extends AppCompatActivity
                 Iterator iterator = userData.inqueue.keySet().iterator();
                 GridAdapter_.clear();
                 int i = 1;
+                Vector<Griditem> plate_vec = new Vector<Griditem>();
+                plate_vec.clear();
                 while (iterator.hasNext()) {
                     String temp = (String) iterator.next();
                     String num = Integer.toString(i);
                     i++;
                     Griditem plate= new Griditem(num,temp);
-                    GridAdapter_.add(plate);  // adapter에 추가합니다.
+                    plate_vec.add(plate);
                     plate = null;
                     System.gc();
                 }
+                for(int j = plate_vec.size()-1, k = 1; j>-1;j--,k++){
+                    String num = Integer.toString(k);
+                    plate_vec.get(j).setNum(num);
+                    GridAdapter_.add(plate_vec.get(j));
+                }
+                plate_vec = null;
+                System.gc();
                 GridAdapter_.notifyDataSetChanged();
             }
 
