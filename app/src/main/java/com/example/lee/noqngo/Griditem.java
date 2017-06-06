@@ -1,23 +1,28 @@
 package com.example.lee.noqngo;
 
+import java.util.Comparator;
+
 /**
  * Created by jang on 2017-06-04.
  */
 
 public class Griditem {
 
-    private String num;
+    public int num;
     private String token;
-
-    public Griditem(String name, String url) {
-        this.num=name;
-        this.token=url;
+    public  Griditem(){
+        this.num = 999;
+        this.token = "999";
+    }
+    public Griditem(int num, String token) {
+        this.num=num;
+        this.token=token;
     }
 
-    public String getNum() {
+    public int getNum() {
         return num;
     }
-    public void setNum(String num) {
+    public void setNum(int num) {
         this.num = num;
     }
     public String getToken() {
@@ -28,3 +33,5 @@ public class Griditem {
     }
 
 }
+
+class MemberComparator implements Comparator { public int compare(Object arg0, Object arg1) { return ((Griditem)arg0).num > ((Griditem)arg1).num ?1:0; } }

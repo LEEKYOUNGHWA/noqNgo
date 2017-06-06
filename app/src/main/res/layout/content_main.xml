@@ -17,7 +17,9 @@
         android:id="@+id/key"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
+        android:textStyle="bold"
+        android:textSize="25dp"
+        android:layout_marginBottom="20dp"
         android:text="key" />
 
     <GridView

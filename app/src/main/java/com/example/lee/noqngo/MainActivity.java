@@ -32,6 +32,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
@@ -83,7 +84,7 @@ public class MainActivity extends AppCompatActivity
         email =  user.getEmail();
         final String uid = user.getUid();
         TextView textView1 = (TextView)findViewById(R.id.key) ;
-        textView1.setText(email+uid+name+keyval);
+        textView1.setText(name);
 
         authListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -122,7 +123,7 @@ public class MainActivity extends AppCompatActivity
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Griditem data = (Griditem)adapterView.getAdapter().getItem(i);
                 final String Data_ = data.getToken();
-                Toast.makeText(getApplicationContext(), Data_, Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "고객 호출", Toast.LENGTH_LONG).show();
                 //     final String Data = (String)adapterView.getAdapter().getItem(i);  //리스트뷰의 포지션 내용을 가져옴.
                 new Thread(new Runnable() {
                     @Override
@@ -167,7 +168,50 @@ public class MainActivity extends AppCompatActivity
                 final String Data_ = data.getToken();
 
                 databaseReference.child("cnt").child(Integer.toString(keyval)).child("inqueue").child(Data_).removeValue();
+                databaseReference.child("UserQueue").child(Data_).child(Integer.toString(keyval)).removeValue();
                 Toast.makeText(getApplicationContext(), "삭제", Toast.LENGTH_LONG).show();
+                for(int j = 0; j<4; j++){
+                    Griditem data2 = (Griditem)adapterView.getAdapter().getItem(j);
+                    if(data2.getNum() == 999){
+                        break;
+                    }
+                    final String Data_2 = data2.getToken();
+                    Toast.makeText(getApplicationContext(), "호출3", Toast.LENGTH_LONG).show();
+                    //     final String Data = (String)adapterView.getAdapter().getItem(i);  //리스트뷰의 포지션 내용을 가져옴.
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                // FMC 메시지 생성 start
+                                JSONObject root = new JSONObject();
+                                JSONObject notification = new JSONObject();
+                                notification.put("sid",uid);
+                                notification.put("body", keyval); //여기 가게 번호 넣자
+                                notification.put("title",name);//여기 가게이름 넣고
+                                root.put("data", notification);
+                                // 여기 수정
+                                root.put("to", Data_2);
+                                // FMC 메시지 생성 end
+
+                                URL Url = new URL(FCM_MESSAGE_URL);
+                                HttpURLConnection conn = (HttpURLConnection) Url.openConnection();
+                                conn.setRequestMethod("POST");
+                                conn.setDoOutput(true);
+                                conn.setDoInput(true);
+                                conn.addRequestProperty("Authorization", "key=" + SERVER_KEY);
+                                conn.setRequestProperty("Accept", "application/json");
+                                conn.setRequestProperty("Content-type", "application/json");
+                                conn.addRequestProperty("url",FCM_MESSAGE_URL);
+                                OutputStream os = conn.getOutputStream();
+                                os.write(root.toString().getBytes("utf-8"));
+                                os.flush();
+                                conn.getResponseCode();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }).start();
+                }
                 return true;
             }
 
@@ -181,22 +225,24 @@ public class MainActivity extends AppCompatActivity
             public void onDataChange(DataSnapshot dataSnapshot) {
                 final QCnt userData = dataSnapshot.getValue(QCnt.class);  // chatData를 가져오고
                 Iterator iterator = userData.inqueue.keySet().iterator();
+
                 GridAdapter_.clear();
                 int i = 1;
                 Vector<Griditem> plate_vec = new Vector<Griditem>();
+
+
                 plate_vec.clear();
                 while (iterator.hasNext()) {
                     String temp = (String) iterator.next();
-                    String num = Integer.toString(i);
-                    i++;
-                    Griditem plate= new Griditem(num,temp);
+                    int numvalue = userData.inqueue.get(temp);
+                    Griditem plate= new Griditem(numvalue,temp);
                     plate_vec.add(plate);
                     plate = null;
                     System.gc();
                 }
-                for(int j = plate_vec.size()-1, k = 1; j>-1;j--,k++){
-                    String num = Integer.toString(k);
-                    plate_vec.get(j).setNum(num);
+                Collections.sort(plate_vec, new MemberComparator());
+
+                for(int j = 0; j<plate_vec.size();j++){
                     GridAdapter_.add(plate_vec.get(j));
                 }
                 plate_vec = null;

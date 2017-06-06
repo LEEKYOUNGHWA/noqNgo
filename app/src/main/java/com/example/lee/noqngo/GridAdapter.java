@@ -41,7 +41,8 @@ public class GridAdapter extends ArrayAdapter<Griditem> {
 
             TextView bookmarkName = (TextView) view.findViewById(R.id.bookmark_name);
             bookmarkName.setTypeface(Typeface.DEFAULT_BOLD);
-            bookmarkName.setText(item.getNum());
+            String A = Integer.toString(item.getNum());
+            bookmarkName.setText(A);
 
             //    TextView bookmarkUrl = (TextView) view.findViewById(R.id.bookmark_url);
             //    bookmarkUrl.setText(item.getUrl());
