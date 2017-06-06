@@ -3,7 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/git_noq.iml" filepath="$PROJECT_DIR$/git_noq.iml" />
       <module fileurl="file://$PROJECT_DIR$/noqNgo.iml" filepath="$PROJECT_DIR$/noqNgo.iml" />
     </modules>
   </component>
