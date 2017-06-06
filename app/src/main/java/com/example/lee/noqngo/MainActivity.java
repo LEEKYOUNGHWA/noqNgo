@@ -119,7 +119,8 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         View Navi_header = navigationView.getHeaderView(0);
-        TextView Head_text = (TextView) Navi_header.findViewById(R.id.)
+        TextView Head_text = (TextView) Navi_header.findViewById(R.id.store_name);
+        Head_text.setText(name);
         navigationView.setNavigationItemSelectedListener(this);
 
         //고객리스트
