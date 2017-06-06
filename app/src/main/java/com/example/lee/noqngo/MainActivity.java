@@ -269,7 +269,7 @@ public class MainActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_slideshow) {
             //nfc sender
-            Intent intent2 = new Intent(MainActivity.this, nfcActivity.class);
+            Intent intent2 = new Intent(MainActivity.this, NFCtagActivity.class);
             startActivity(intent2);
 
         } else if (id == R.id.nav_manage) {

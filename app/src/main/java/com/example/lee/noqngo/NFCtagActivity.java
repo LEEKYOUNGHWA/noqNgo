@@ -50,10 +50,7 @@ public class NFCtagActivity extends Activity {
         context = this;
 
         tvNFCContent = (TextView) findViewById(R.id.nfc_contents);
-<<<<<<< HEAD
-       // message = (TextView) findViewById(R.id.edit_message);
-=======
->>>>>>> 0310caa30a0bbe618eab3e44e5c9c5d2e2036c72
+
         btnWrite = (Button) findViewById(R.id.button);
 
         btnWrite.setOnClickListener(new View.OnClickListener()
