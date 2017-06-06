@@ -1,12 +1,16 @@
 package com.example.lee.noqngo;
 
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Environment;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -52,9 +56,7 @@ public class QRcodeActivity extends AppCompatActivity{
                 Bitmap barcode = createBarcode(strBarcode);
                 img.setImageBitmap(barcode);
                 img.invalidate();
-
-                
-
+                checkPermission();
                 String path = saveBitmapToJpeg(barcode,uid);
 
             }
@@ -63,6 +65,36 @@ public class QRcodeActivity extends AppCompatActivity{
 
 
     }
+
+    private void checkPermission(){
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
+        }else{
+        }
+    }
+    //권한 체크관련
+
+    public void onRequestPermissionsResult(int requestCode, String permissions, int grantResults) {
+        switch (requestCode) {
+            case 1:
+                if (grantResults == PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(getApplicationContext(), "기기에 qr코드가 저장됩니다", Toast.LENGTH_SHORT).show();
+                    // 권한 허가
+                    // 해당 권한을 사용해서 작업을 진행할 수 있습니다
+
+                } else {
+                    // 권한 거부
+                    // 사용자가 해당권한을 거부했을때 해주어야 할 동작을 수행합니다
+                    Toast.makeText(getApplicationContext(), "권한 없이 해당 기능을 사용할 수 없습니다.", Toast.LENGTH_SHORT).show();
+                    finish();
+
+                }
+        }
+    }
+
+
+
+
 
     public Bitmap createBarcode(String code){
 
@@ -92,7 +124,7 @@ public class QRcodeActivity extends AppCompatActivity{
 
         String fileName = name + ".jpg";  // 파일이름은 마음대로!
 
-        File tempFile = new File("/sdcard/noqNgo/",fileName);
+        File tempFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath()+"/noqNgo/",fileName);
 
         try{
             tempFile.createNewFile();  // 파일을 생성해주고
