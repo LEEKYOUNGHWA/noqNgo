@@ -120,6 +120,8 @@ public class MainActivity extends AppCompatActivity
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        View Navi_header = navigationView.getHeaderView(0);
+        TextView Head_text = (TextView) Navi_header.findViewById(R.id.)
         navigationView.setNavigationItemSelectedListener(this);
 
         //고객리스트
