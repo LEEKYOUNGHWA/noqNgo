@@ -162,7 +162,7 @@ public class SignupActivity extends SampleActivityBase implements PlaceSelection
                                     //Snackbar.make(v, "회원가입 성공", Snackbar.LENGTH_LONG).setAction("Action", null).show();
                                     //Toast.makeText(SignupActivity.this, "회원가입 성공", Toast.LENGTH_SHORT).show();
                                     databaseReference.child("register").child(auth.getCurrentUser().getUid()).setValue(registers);
-                                    startActivity(new Intent(SignupActivity.this, LoginActivity.class));
+                                    startActivity(new Intent(SignupActivity.this, getuserdata.class));
                                     finish();
                                 }
                             }
