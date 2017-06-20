@@ -44,7 +44,7 @@
             />
         <activity
             android:name=".QRcodeActivity"
-            android:theme="@android:style/Theme.DeviceDefault.Light.Dialog"/>
+            android:theme="@style/AppTheme.NoActionBar"/>
         <activity android:name=".nfcActivity"/>
         <activity
             android:name=".getuserdata"
