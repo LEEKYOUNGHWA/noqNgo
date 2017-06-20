@@ -8,6 +8,7 @@ import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -35,6 +36,7 @@ public class QRcodeActivity extends AppCompatActivity{
     @Override
     protected void onCreate(Bundle savedInstance) {
         super.onCreate(savedInstance);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_qrcode);
 
         img = (ImageView) findViewById(R.id.imageView1);

@@ -125,7 +125,6 @@ public class SignupActivity extends SampleActivityBase implements PlaceSelection
                     return;
                 }
 
-                dialog = ProgressDialog.show(SignupActivity.this, "", "회원가입듕", true);
 
                 userData.qcount = 0; //큐카운트 0 초기화
                 markerData = new QMarker(Info,userData.keynum,lat,lon,Name); //큐마커에 userdata, keynum, lat ,lon, name 넣기
@@ -148,17 +147,14 @@ public class SignupActivity extends SampleActivityBase implements PlaceSelection
                             public void onComplete(@NonNull Task<AuthResult> task) {
                                 //Snackbar.make(v, "Password too short, enter minimum 6 characters!", Snackbar.LENGTH_LONG).setAction("Action", null).show();
                                 Toast.makeText(SignupActivity.this, "회원가입?:" + task.isSuccessful(), Toast.LENGTH_SHORT).show();
-                                dialog.dismiss();
                                 // If sign in fails, display a message to the user. If sign in succeeds
                                 // the auth state listener will be notified and logic to handle the
                                 // signed in user can be handled in the listener.
                                 if (!task.isSuccessful()) {
-                                    dialog.dismiss();
                                     Toast.makeText(SignupActivity.this, "회원가입 실패." + task.getException(),
                                             Toast.LENGTH_SHORT).show();
                                 } else {
 
-                                    dialog.dismiss();
                                     //Snackbar.make(v, "회원가입 성공", Snackbar.LENGTH_LONG).setAction("Action", null).show();
                                     //Toast.makeText(SignupActivity.this, "회원가입 성공", Toast.LENGTH_SHORT).show();
                                     databaseReference.child("register").child(auth.getCurrentUser().getUid()).setValue(registers);
