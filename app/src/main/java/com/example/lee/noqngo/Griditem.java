@@ -34,4 +34,6 @@ public class Griditem {
 
 }
 
-class MemberComparator implements Comparator { public int compare(Object arg0, Object arg1) { return ((Griditem)arg0).num > ((Griditem)arg1).num ?1:0; } }
+class MemberComparator implements Comparator {
+    public int compare(Object arg0, Object arg1) {
+        return ((Griditem)arg0).num > ((Griditem)arg1).num ? 1: ((Griditem)arg0).num == ((Griditem)arg1).num  ? 0 : -1; } }
