@@ -171,7 +171,13 @@ public class MainActivity extends AppCompatActivity
                 databaseReference.child("UserQueue").child(Data_).child(Integer.toString(keyval)).removeValue();
                 Toast.makeText(getApplicationContext(), "삭제", Toast.LENGTH_LONG).show();
                 for(int j = 0; j<4; j++){
-                    Griditem data2 = (Griditem)adapterView.getAdapter().getItem(j);
+                    try {
+                        Griditem data2 = (Griditem) adapterView.getAdapter().getItem(j);
+                    }
+                    catch(Exception e){
+                        break;
+                    }
+                    Griditem data2 = (Griditem) adapterView.getAdapter().getItem(j);
                     if(data2.getNum() == 999){
                         break;
                     }
