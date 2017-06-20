@@ -39,9 +39,11 @@ public class NFCtagActivity extends Activity {
     Tag myTag;
     Context context;
 
-    TextView tvNFCContent;
     TextView message;
     Button btnWrite;
+    Button tempbtn;
+
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -49,9 +51,8 @@ public class NFCtagActivity extends Activity {
         setContentView(R.layout.activity_nfctag);
         context = this;
 
-        tvNFCContent = (TextView) findViewById(R.id.nfc_contents);
-
         btnWrite = (Button) findViewById(R.id.button);
+
 
         btnWrite.setOnClickListener(new View.OnClickListener()
         {
@@ -125,7 +126,7 @@ public class NFCtagActivity extends Activity {
             Log.e("UnsupportedEncoding", e.toString());
         }
 
-        tvNFCContent.setText("NFC Content: " + text);
+
     }
 
 

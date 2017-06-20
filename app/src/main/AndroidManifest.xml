@@ -38,7 +38,7 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".NFCtagActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@android:style/Theme.DeviceDefault.Light.Dialog" />
         <activity
             android:name=".SignupActivity"
             />
