@@ -1,5 +1,6 @@
 package com.example.lee.noqngo;
 
+import android.Manifest;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -64,14 +65,14 @@ public class QRcodeActivity extends AppCompatActivity{
             }
         });
 
-
-
     }
 
     private void checkPermission(){
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
-        }else{
+
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+
+            }else{
         }
     }
     //권한 체크관련
@@ -103,8 +104,8 @@ public class QRcodeActivity extends AppCompatActivity{
         Bitmap bitmap =null;
         MultiFormatWriter gen = new MultiFormatWriter();
         try {
-            final int WIDTH = 840;
-            final int HEIGHT = 840;
+            final int WIDTH = 500;
+            final int HEIGHT = 500;
             BitMatrix bytemap = gen.encode(code, BarcodeFormat.QR_CODE, WIDTH, HEIGHT);
             bitmap = Bitmap.createBitmap(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888);
             for (int i = 0 ; i < WIDTH ; ++i)
