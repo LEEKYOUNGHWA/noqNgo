@@ -1,13 +1,15 @@
 package com.example.lee.noqngo;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -24,11 +26,12 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 
 /**
  * Created by Lee on 2017-05-06.
  */
-public class QRcodeActivity extends AppCompatActivity{
+public class QRcodeActivity extends Activity{
     private String LOG_TAG = "QRcodeActivity";
 
     ImageView img;
@@ -41,6 +44,7 @@ public class QRcodeActivity extends AppCompatActivity{
         setContentView(R.layout.activity_qrcode);
 
         img = (ImageView) findViewById(R.id.imageView1);
+        img.setPadding(30,30,30,30);
 
         Button qrbutton = (Button)findViewById(R.id.qrbutton);
 
@@ -49,6 +53,14 @@ public class QRcodeActivity extends AppCompatActivity{
         final String uid = user.getUid();
 
         final String strBarcode = "https://fir-82b14.firebaseapp.com/customer.html?sid="+uid;
+        final String path = Environment.getExternalStorageDirectory().toString();
+
+        File imgg = new File(path+"/"+uid);
+        if(imgg.exists()){
+            Bitmap myBitmap = BitmapFactory.decodeFile(imgg.getAbsolutePath());
+            img.setImageBitmap(myBitmap);
+
+        }
 
 
         qrbutton.setOnClickListener(new View.OnClickListener() {
@@ -60,7 +72,36 @@ public class QRcodeActivity extends AppCompatActivity{
                 img.setImageBitmap(barcode);
                 img.invalidate();
                 checkPermission();
-                String path = saveBitmapToJpeg(barcode,uid);
+                saveBitmapToJpeg(barcode,uid);
+
+
+                //String path = saveBitmapToJpeg(barcode,uid);
+
+
+
+                try{
+
+
+                    OutputStream fOut = null;
+                    Integer counter = 0;
+                    File file = new File(path,uid+".jpg");
+                    fOut = new FileOutputStream(file);
+
+                    Bitmap pictureBitmap = barcode; // obtaining the Bitmap
+                    pictureBitmap.compress(Bitmap.CompressFormat.JPEG, 85, fOut); // saving the Bitmap to a file compressed as a JPEG with 85% compression rate
+                    fOut.flush(); // Not really required
+                    fOut.close(); // do not forget to close the stream
+
+                    MediaStore.Images.Media.insertImage(getContentResolver(),file.getAbsolutePath(),file.getName(),file.getName());
+
+
+                    Toast.makeText(getApplicationContext(), "file ok", Toast.LENGTH_SHORT).show();
+                }catch(Exception e) { Toast.makeText(getApplicationContext(), "file error", Toast.LENGTH_SHORT).show();}
+
+
+
+
+
 
             }
         });
@@ -77,10 +118,12 @@ public class QRcodeActivity extends AppCompatActivity{
     }
     //권한 체크관련
 
-    public void onRequestPermissionsResult(int requestCode, String permissions, int grantResults) {
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
         switch (requestCode) {
             case 1:
-                if (grantResults == PackageManager.PERMISSION_GRANTED) {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED&&grantResults[1]==PackageManager.PERMISSION_GRANTED) {
+
                     Toast.makeText(getApplicationContext(), "기기에 qr코드가 저장됩니다", Toast.LENGTH_SHORT).show();
                     // 권한 허가
                     // 해당 권한을 사용해서 작업을 진행할 수 있습니다
@@ -92,6 +135,9 @@ public class QRcodeActivity extends AppCompatActivity{
                     finish();
 
                 }
+
+                return;
+
         }
     }
 
@@ -104,8 +150,8 @@ public class QRcodeActivity extends AppCompatActivity{
         Bitmap bitmap =null;
         MultiFormatWriter gen = new MultiFormatWriter();
         try {
-            final int WIDTH = 500;
-            final int HEIGHT = 500;
+            final int WIDTH = 800;
+            final int HEIGHT = 800;
             BitMatrix bytemap = gen.encode(code, BarcodeFormat.QR_CODE, WIDTH, HEIGHT);
             bitmap = Bitmap.createBitmap(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888);
             for (int i = 0 ; i < WIDTH ; ++i)

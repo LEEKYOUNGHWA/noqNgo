@@ -6,6 +6,9 @@
     android:layout_height="280dip">
 
     <Button
+        android:layout_marginTop="20dp"
+        android:layout_gravity="center"
+        android:gravity="center"
         android:id="@+id/qrbutton"
         android:text="qr코드 생성"
         android:layout_width="wrap_content"
